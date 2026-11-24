@@ -1,0 +1,18 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/search-backend.response.schema.json",
+  "title": "SearchBackendResponse",
+  "type": "object",
+  "required": ["request_id", "status", "consulted_at"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "partial", "unavailable", "error"] },
+    "consulted_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "results": { "type": ["array", "object", "null"] },
+    "summary": { "type": "string" },
+    "observed_cost": { "type": ["object", "null"] },
+    "estimated_cost": { "oneOf": [ { "$ref": "common.schema.json#/$defs/costEstimate" }, { "type": "null" } ] },
+    "error": { "type": "object" }
+  },
+  "additionalProperties": true
+}

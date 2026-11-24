@@ -1,0 +1,31 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/alert-source.response.schema.json",
+  "title": "AlertSourceResponse",
+  "type": "object",
+  "required": ["status", "consulted_at", "alerts"],
+  "properties": {
+    "status": { "type": "string", "enum": ["ok", "partial", "unavailable", "error"] },
+    "consulted_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["alert_id", "source", "received_at", "content"],
+        "properties": {
+          "alert_id": { "type": "string" },
+          "source": { "type": "object" },
+          "occurred_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "received_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+          "reported_severity": { "type": "string" },
+          "content": { "type": ["object", "string", "array", "number", "boolean", "null"] },
+          "attributes": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "pagination": { "type": "object" },
+    "error": { "type": "object" }
+  },
+  "additionalProperties": true
+}

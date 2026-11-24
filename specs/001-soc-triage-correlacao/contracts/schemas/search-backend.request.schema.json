@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/search-backend.request.schema.json",
+  "title": "SearchBackendRequest",
+  "type": "object",
+  "required": ["request_id", "objective", "requested_at"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "objective": { "type": "string" },
+    "query": { "type": ["object", "string"] },
+    "time_window": { "$ref": "common.schema.json#/$defs/timeWindow" },
+    "data_scope": { "type": "object", "description": "Logical scope (sources/index classes/tenants) as authorized" },
+    "limits": { "type": "object" },
+    "dry_run": { "type": "boolean", "description": "If supported by adapter, estimate without full execution" }
+  },
+  "additionalProperties": true
+}

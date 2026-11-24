@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/threat-intel.response.schema.json",
+  "title": "ThreatIntelResponse",
+  "type": "object",
+  "required": ["request_id", "status", "consulted_at", "matches"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "partial", "unavailable", "error"] },
+    "consulted_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "matches": { "type": "array", "items": { "type": "object" } },
+    "error": { "type": "object" }
+  },
+  "additionalProperties": true
+}

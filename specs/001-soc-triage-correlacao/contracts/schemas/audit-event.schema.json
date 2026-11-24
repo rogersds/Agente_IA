@@ -1,0 +1,22 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/audit-event.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "required": ["audit_id", "event_type", "occurred_at", "input_summary", "reasoning_summary", "outcome"],
+  "properties": {
+    "audit_id": { "type": "string" },
+    "event_type": { "type": "string" },
+    "occurred_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "input_summary": { "type": ["object", "string"] },
+    "consulted_sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/consultedSource" } },
+    "reasoning_summary": { "type": "string" },
+    "confidence": { "oneOf": [ { "$ref": "common.schema.json#/$defs/confidence" }, { "type": "null" } ] },
+    "model_version": { "type": ["string", "null"] },
+    "prompt_version": { "type": ["string", "null"] },
+    "policy_version": { "type": ["string", "null"] },
+    "outcome": { "type": "object" },
+    "correlation_refs": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

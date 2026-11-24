@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/policy-decision.request.schema.json",
+  "title": "PolicyDecisionRequest",
+  "type": "object",
+  "required": ["request_id", "proposal_kind", "candidate", "context", "requested_at"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "proposal_kind": { "type": "string", "enum": ["containment", "query_execution", "query_proposal", "other_action"] },
+    "candidate": { "type": "object", "description": "Candidate proposal artifact or envelope to evaluate" },
+    "context": {
+      "type": "object",
+      "properties": {
+        "has_explicit_approval_record": { "type": "boolean" },
+        "approval_record": { "type": ["object", "null"] },
+        "target_ambiguous": { "type": "boolean" },
+        "data_sufficient": { "type": "boolean" },
+        "rollback_documented": { "type": "boolean" },
+        "query_parameters_complete": { "type": "boolean" },
+        "initiator": { "type": ["string", "object", "null"] }
+      },
+      "additionalProperties": true
+    },
+    "requested_at": { "$ref": "common.schema.json#/$defs/timestamp" }
+  },
+  "additionalProperties": true
+}

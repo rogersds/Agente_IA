@@ -1,0 +1,18 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/llm.response.schema.json",
+  "title": "LlmProviderResponse",
+  "type": "object",
+  "required": ["request_id", "status", "completed_at", "model_version", "prompt_version"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "error"] },
+    "completed_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "output": { "type": ["object", "array", "string", "number", "boolean", "null"] },
+    "model_version": { "type": "string" },
+    "prompt_version": { "type": "string" },
+    "usage": { "type": "object" },
+    "error": { "type": "object" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,56 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/containment-proposal.schema.json",
+  "title": "ContainmentProposal",
+  "type": "object",
+  "required": ["proposal_id", "incident_or_alert_ref", "action_category", "target", "classification", "confidence", "consulted_sources", "rollback_plan", "approval_requirement", "approval_status", "hypotheses", "data_sufficiency", "policy_decision", "trace"],
+  "properties": {
+    "proposal_id": { "type": "string" },
+    "incident_or_alert_ref": { "type": "string" },
+    "action_category": { "type": "string", "enum": ["network", "host", "identity_account", "process", "credential_token"] },
+    "target": {
+      "type": "object",
+      "required": ["identifier", "type", "unambiguous"],
+      "properties": {
+        "identifier": { "type": "string" },
+        "type": { "type": "string" },
+        "unambiguous": { "const": true },
+        "attributes": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "classification": { "$ref": "common.schema.json#/$defs/classification" },
+    "confidence": { "$ref": "common.schema.json#/$defs/confidence" },
+    "consulted_sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/consultedSource" } },
+    "rollback_plan": {
+      "type": "object",
+      "required": ["summary", "steps", "responsible", "validation", "limitations"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "preconditions": { "type": "array", "items": { "type": "string" } },
+        "steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "responsible": { "type": "string", "minLength": 1 },
+        "validation": { "type": "string", "minLength": 1 },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "approval_requirement": {
+      "type": "object",
+      "required": ["requires_human_approval", "identified_approver_required", "execution_permitted"],
+      "properties": {
+        "requires_human_approval": { "const": true },
+        "identified_approver_required": { "const": true },
+        "execution_permitted": { "const": false },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "approval_status": { "type": "string", "enum": ["pending", "approved", "rejected", "blocked"] },
+    "hypotheses": { "$ref": "common.schema.json#/$defs/hypotheses" },
+    "data_sufficiency": { "$ref": "common.schema.json#/$defs/dataSufficiency" },
+    "policy_decision": { "$ref": "policy-decision.response.schema.json" },
+    "trace": { "$ref": "common.schema.json#/$defs/trace" }
+  },
+  "additionalProperties": true
+}

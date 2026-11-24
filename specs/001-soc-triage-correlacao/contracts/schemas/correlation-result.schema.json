@@ -1,0 +1,20 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/correlation-result.schema.json",
+  "title": "CorrelationResult",
+  "type": "object",
+  "required": ["correlation_id", "scope", "related_alerts", "classification", "confidence", "consulted_sources", "data_sufficiency", "hypotheses", "trace"],
+  "properties": {
+    "correlation_id": { "type": "string" },
+    "scope": { "type": "object" },
+    "related_alerts": { "type": "array", "items": { "type": "string" } },
+    "classification": { "$ref": "common.schema.json#/$defs/classification" },
+    "confidence": { "$ref": "common.schema.json#/$defs/confidence" },
+    "consulted_sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/consultedSource" } },
+    "data_sufficiency": { "$ref": "common.schema.json#/$defs/dataSufficiency" },
+    "hypotheses": { "$ref": "common.schema.json#/$defs/hypotheses" },
+    "escalation": { "type": ["object", "null"] },
+    "trace": { "$ref": "common.schema.json#/$defs/trace" }
+  },
+  "additionalProperties": true
+}

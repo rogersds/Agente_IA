@@ -1,0 +1,29 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/action-proposal-queue.request.schema.json",
+  "title": "ActionProposalQueueRequest",
+  "type": "object",
+  "required": ["operation", "requested_at"],
+  "properties": {
+    "operation": { "type": "string", "enum": ["enqueue", "update_status", "get"] },
+    "requested_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "proposal": { "type": "object", "description": "ContainmentProposal or QueryProposal (must include policy_decision)" },
+    "proposal_id": { "type": "string" },
+    "status_update": {
+      "type": "object",
+      "properties": {
+        "proposal_id": { "type": "string" },
+        "new_status": { "type": "string" },
+        "approval_record": { "$ref": "approval-record.schema.json" },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "operation": { "const": "enqueue" } } }, "then": { "required": ["proposal"] } },
+    { "if": { "properties": { "operation": { "const": "get" } } }, "then": { "required": ["proposal_id"] } },
+    { "if": { "properties": { "operation": { "const": "update_status" } } }, "then": { "required": ["status_update"] } }
+  ],
+  "additionalProperties": true
+}

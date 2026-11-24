@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/audit.request.schema.json",
+  "title": "AuditRequest",
+  "type": "object",
+  "required": ["operation", "requested_at"],
+  "properties": {
+    "operation": { "type": "string", "enum": ["append", "query"] },
+    "requested_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "event": { "$ref": "audit-event.schema.json" },
+    "query": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "operation": { "const": "append" } } }, "then": { "required": ["event"] } }
+  ],
+  "additionalProperties": true
+}

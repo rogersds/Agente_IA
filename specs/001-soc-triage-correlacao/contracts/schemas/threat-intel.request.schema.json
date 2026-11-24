@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/threat-intel.request.schema.json",
+  "title": "ThreatIntelRequest",
+  "type": "object",
+  "required": ["request_id", "indicators", "requested_at"],
+  "properties": {
+    "request_id": { "type": "string" },
+    "indicators": { "type": "array", "minItems": 1, "items": { "type": "object" } },
+    "requested_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "context": { "type": "object" }
+  },
+  "additionalProperties": true
+}

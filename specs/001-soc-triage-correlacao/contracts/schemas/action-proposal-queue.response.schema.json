@@ -1,0 +1,16 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/action-proposal-queue.response.schema.json",
+  "title": "ActionProposalQueueResponse",
+  "type": "object",
+  "required": ["operation", "status", "completed_at"],
+  "properties": {
+    "operation": { "type": "string" },
+    "status": { "type": "string", "enum": ["ok", "not_found", "rejected", "error"] },
+    "completed_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "proposal_id": { "type": "string" },
+    "proposal": { "type": "object" },
+    "message": { "type": "string" }
+  },
+  "additionalProperties": true
+}

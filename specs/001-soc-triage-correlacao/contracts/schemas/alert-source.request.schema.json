@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/alert-source.request.schema.json",
+  "title": "AlertSourceRequest",
+  "type": "object",
+  "required": ["operation", "requested_at"],
+  "properties": {
+    "operation": { "type": "string", "enum": ["fetch_alerts", "get_alert"] },
+    "requested_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "alert_id": { "type": "string" },
+    "time_window": { "$ref": "common.schema.json#/$defs/timeWindow" },
+    "filters": { "type": "object" },
+    "pagination": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "operation": { "const": "get_alert" } } }, "then": { "required": ["alert_id"] } }
+  ],
+  "additionalProperties": true
+}

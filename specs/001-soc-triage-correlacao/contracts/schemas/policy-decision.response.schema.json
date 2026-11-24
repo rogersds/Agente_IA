@@ -1,0 +1,19 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/policy-decision.response.schema.json",
+  "title": "PolicyDecisionResponse",
+  "type": "object",
+  "required": ["decision_id", "policy_id", "policy_version", "evaluated_at", "input_ref", "result", "reasons"],
+  "properties": {
+    "decision_id": { "type": "string" },
+    "policy_id": { "type": "string" },
+    "policy_version": { "type": "string" },
+    "evaluated_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "input_ref": { "type": "object" },
+    "result": { "type": "string", "enum": ["allow_proposal", "require_revision", "block_and_escalate"] },
+    "reasons": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "required_actions": { "type": "array", "items": { "type": "string" } },
+    "obligations": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": true
+}

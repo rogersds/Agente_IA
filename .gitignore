@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environment / secrets (never commit)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets/
+**/secrets.local.*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+
+# Local data (pilot runtime artifacts; keep out of VCS by default)
+*.sqlite
+*.sqlite3
+*.db
+data/local/
+runtime/
+logs/

@@ -1,0 +1,4 @@
+-r requirements.txt  # optional base deps if created later
+jsonschema>=4.21
+pytest>=8.0
+ruff>=0.6

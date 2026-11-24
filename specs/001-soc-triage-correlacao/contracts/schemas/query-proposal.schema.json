@@ -1,0 +1,38 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/query-proposal.schema.json",
+  "title": "QueryProposal",
+  "type": "object",
+  "required": ["query_proposal_id", "objective", "classification", "confidence", "consulted_sources", "query_artifact", "execution_status", "requires_human_review", "hypotheses", "data_sufficiency", "policy_decision", "trace"],
+  "properties": {
+    "query_proposal_id": { "type": "string" },
+    "objective": { "type": "string" },
+    "classification": { "$ref": "common.schema.json#/$defs/classification" },
+    "confidence": { "$ref": "common.schema.json#/$defs/confidence" },
+    "consulted_sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/consultedSource" } },
+    "time_window": { "oneOf": [ { "$ref": "common.schema.json#/$defs/timeWindow" }, { "type": "null" } ] },
+    "data_scope": { "type": ["object", "null"] },
+    "cost_estimate": { "oneOf": [ { "$ref": "common.schema.json#/$defs/costEstimate" }, { "type": "null" } ] },
+    "parameter_justification": { "type": "string", "description": "Required when time_window/data_scope/cost_estimate is missing or partial" },
+    "query_artifact": { "type": ["object", "string"] },
+    "execution_status": { "type": "string", "enum": ["proposed", "pending_review", "approved", "rejected", "blocked"] },
+    "requires_human_review": { "const": true },
+    "hypotheses": { "$ref": "common.schema.json#/$defs/hypotheses" },
+    "data_sufficiency": { "$ref": "common.schema.json#/$defs/dataSufficiency" },
+    "policy_decision": { "$ref": "policy-decision.response.schema.json" },
+    "trace": { "$ref": "common.schema.json#/$defs/trace" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          { "properties": { "time_window": { "const": null } }, "required": ["time_window"] },
+          { "properties": { "data_scope": { "const": null } }, "required": ["data_scope"] },
+          { "properties": { "cost_estimate": { "const": null } }, "required": ["cost_estimate"] }
+        ]
+      },
+      "then": { "required": ["parameter_justification"] }
+    }
+  ],
+  "additionalProperties": true
+}

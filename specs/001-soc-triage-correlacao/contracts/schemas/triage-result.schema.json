@@ -1,0 +1,21 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/triage-result.schema.json",
+  "title": "TriageResult",
+  "type": "object",
+  "required": ["triage_id", "alert_id", "classification", "confidence", "consulted_sources", "data_sufficiency", "hypotheses", "trace"],
+  "properties": {
+    "triage_id": { "type": "string" },
+    "alert_id": { "type": "string" },
+    "classification": { "$ref": "common.schema.json#/$defs/classification" },
+    "confidence": { "$ref": "common.schema.json#/$defs/confidence" },
+    "consulted_sources": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/consultedSource" } },
+    "data_sufficiency": { "$ref": "common.schema.json#/$defs/dataSufficiency" },
+    "hypotheses": { "$ref": "common.schema.json#/$defs/hypotheses" },
+    "recommended_next_steps": { "type": "array", "items": { "type": "string" } },
+    "escalation": { "type": ["object", "null"] },
+    "ioc_signals": { "type": "array", "items": { "type": "object" } },
+    "trace": { "$ref": "common.schema.json#/$defs/trace" }
+  },
+  "additionalProperties": true
+}

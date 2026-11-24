@@ -1,0 +1,27 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://soc-agent.local/contracts/approval-record.schema.json",
+  "title": "ApprovalRecord",
+  "type": "object",
+  "required": ["approval_id", "proposal_id", "proposal_type", "approver", "decision", "scope", "decided_at"],
+  "properties": {
+    "approval_id": { "type": "string" },
+    "proposal_id": { "type": "string" },
+    "proposal_type": { "type": "string", "enum": ["containment", "query_execution"] },
+    "approver": {
+      "type": "object",
+      "required": ["id", "display_name"],
+      "properties": {
+        "id": { "type": "string" },
+        "display_name": { "type": "string" },
+        "role": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "decision": { "type": "string", "enum": ["approved", "rejected"] },
+    "scope": { "type": "object" },
+    "decided_at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}
