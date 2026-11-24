@@ -24,6 +24,28 @@ REQUIRED_FIELDS = [
 ALLOWED_CATEGORIES = {"network", "host", "identity_account", "process", "credential_token"}
 
 
+class ContainmentAmbiguousTargetBlockedError(Exception):
+    """Bloqueio controlado por desenho (R2/R4): alvo ambíguo, sem proposta/enfileiramento/execução.
+
+    Usado para sinalizar ao CLI que a tentativa foi auditada e deve terminar sem traceback,
+    com exit code distinto de erro inesperado.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        request_id: str | None = None,
+        incident_or_alert_ref: str | None = None,
+        audit_id: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.request_id = request_id
+        self.incident_or_alert_ref = incident_or_alert_ref
+        self.audit_id = audit_id
+
+
+
 def validate_containment_proposal(proposal: dict[str, Any]) -> None:
     for f in REQUIRED_FIELDS:
         if f not in proposal:

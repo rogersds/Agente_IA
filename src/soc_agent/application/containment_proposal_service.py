@@ -8,7 +8,7 @@ from soc_agent.application.policy_gate import can_emit_proposal, evaluate_before
 from soc_agent.contracts_runtime.validator import SchemaValidator
 from soc_agent.domain.approval import approval_status_from_record
 from soc_agent.domain.common import classification, consulted_source, data_sufficiency, hypotheses, hypothesis, make_trace, utc_now_iso
-from soc_agent.domain.containment import has_complete_rollback, is_target_ambiguous, validate_containment_proposal
+from soc_agent.domain.containment import ContainmentAmbiguousTargetBlockedError, has_complete_rollback, is_target_ambiguous, validate_containment_proposal
 from soc_agent.domain.policy import build_policy_request
 from soc_agent.ports.action_proposal_queue import ActionProposalQueue
 from soc_agent.ports.policy_engine import PolicyEngine
@@ -27,17 +27,79 @@ class ContainmentProposalService:
         target = params.get("target") or {}
         if not isinstance(target, dict):
             target = {}
-        # normalize to contract shape; ambiguous targets become blocked later
+
+        # Detecção explícita de ambiguidade de alvo (R2/R4): bloqueio por desenho.
+        # Não emitir/enfileirar containment-proposal (schema exige target.unambiguous=true);
+        # registrar auditoria append-only e falhar de forma controlada sem execução.
+        explicit_ambiguous = (
+            target.get("ambiguous") is True
+            or target.get("unambiguous") is False
+            or not (target.get("identifier") or target.get("asset_id") or target.get("id") or target.get("account_id"))
+        )
+        if explicit_ambiguous:
+            # Avaliação de política best-effort para rastreabilidade (policy_version quando aplicável);
+            # nenhuma proposta é criada/enfileirada e nenhuma execução ocorre.
+            policy_version: str | None = None
+            try:
+                policy_req = build_policy_request(
+                    request_id=req_id,
+                    proposal_kind="containment",
+                    candidate={
+                        "action_category": params.get("action_category"),
+                        "target": {"identifier": "ambiguous-target", "type": str(target.get("type") or "ambiguous"), "unambiguous": False},
+                        "approval_requirement": {"execution_permitted": False},
+                    },
+                    context={
+                        "target_ambiguous": True,
+                        "data_sufficient": bool((params.get("data_sufficiency") or {}).get("sufficient")),
+                        "rollback_documented": bool(params.get("rollback_plan")),
+                        "has_explicit_approval_record": False,
+                    },
+                )
+                decision = evaluate_before_proposal(self.policy_engine, policy_req)
+                policy_version = decision.get("policy_version") if isinstance(decision, dict) else None
+                trace["policy_version"] = policy_version
+            except Exception:
+                decision = None
+            audit_event = emit_audit(
+                ctx,
+                "containment_proposal_blocked_ambiguous_target",
+                {
+                    "incident_or_alert_ref": incident_or_alert_ref,
+                    "request_id": req_id,
+                    "block_reason": "ambiguous_target",
+                    "action_category": params.get("action_category"),
+                    "target_unambiguous": False,
+                },
+                "Tentativa de contenção bloqueada por desenho: alvo ambíguo (R2/R4). Nenhuma proposta de contenção criada, nenhuma enfileirada e nenhuma execução realizada; escalonamento requerido para identificação inequívoca pelo humano.",
+                {
+                    "blocked": True,
+                    "reason": "ambiguous_target",
+                    "proposal_created": False,
+                    "proposal_enqueued": False,
+                    "execution_performed": False,
+                    "escalation_required": True,
+                },
+                consulted_sources=consulted,
+                confidence=params.get("confidence"),
+                policy_version=policy_version,
+                correlation_refs=[incident_or_alert_ref, req_id],
+                trace=trace,
+            )
+            raise ContainmentAmbiguousTargetBlockedError(
+                "BLOQUEADO: alvo de contenção ambíguo; nenhuma proposta criada/enfileirada (R2/R4).",
+                request_id=req_id,
+                incident_or_alert_ref=incident_or_alert_ref,
+                audit_id=audit_event.get("audit_id"),
+            )
+
+        # normalize to contract shape for non-ambiguous targets
         normalized_target = {
             "identifier": str(target.get("identifier") or target.get("asset_id") or target.get("id") or target.get("account_id") or "unknown-target"),
             "type": str(target.get("type") or params.get("target_type") or "unknown"),
             "unambiguous": target.get("unambiguous") is True and not target.get("ambiguous"),
             "attributes": target.get("attributes") or {},
         }
-        if target.get("ambiguous") is True or not (target.get("identifier") or target.get("asset_id") or target.get("id") or target.get("account_id")):
-            normalized_target["unambiguous"] = False
-            normalized_target["identifier"] = str(target.get("identifier") or "ambiguous-target")
-            normalized_target["type"] = str(target.get("type") or "ambiguous")
 
         rb = params.get("rollback_plan") or {}
         steps = rb.get("steps") if isinstance(rb.get("steps"), list) and rb.get("steps") else []
