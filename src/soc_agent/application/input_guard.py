@@ -5,10 +5,10 @@ from typing import Any
 
 # Heuristic patterns for instruction-like content embedded in external data (R1).
 _PATTERNS = [
-    r"ignore\s+(all|suas|as)\s+(previous\s+)?(regras|instru[cç][oõ]es|rules)",
+    r"ignore\s+(all|suas|as)\s+(previous\s+)?(regras|instru(?:\u00e7|c)(?:\u00f5|o)es|instrucoes|instructions|rules)",
     r"execute\s+(este\s+)?comando",
     r"run\s+this\s+command",
-    r"voc[eê]\s+agora\s+[eé]",
+    r"voc(?:\u00ea|e)\s+agora\s+(?:\u00e9|e)",
     r"you\s+are\s+now",
     r"disregard\s+(your|all)",
     r"override\s+(policy|rules|instructions)",

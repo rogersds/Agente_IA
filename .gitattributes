@@ -1,0 +1,28 @@
+* text=auto
+
+# Source and docs (consistent LF in repo; avoids mixed EOL warnings)
+*.py text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.rego text eol=lf
+*.ps1 text eol=lf
+*.sh text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+
+# Windows scripts can keep CRLF if needed
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.sqlite binary
+*.exe binary
+*.dll binary
