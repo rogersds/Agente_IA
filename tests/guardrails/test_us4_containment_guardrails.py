@@ -36,18 +36,28 @@ def test_t043_no_rollback_blocks(tmp_path):
 
 
 def test_t043_ambiguous_target_blocks(tmp_path):
-    service = ContainmentProposalService(OpaPolicyEngineAdapter(), LocalActionProposalQueue(tmp_path / "q.jsonl"))
     import pytest
-    from soc_agent.contracts_runtime.validator import SchemaValidationError
-    # R2: alvo ambíguo não pode ser emitido como ContainmentProposal válida (contrato exige target.unambiguous=true);
-    # tentativa deve ser bloqueada/falhar na validação de emissão.
-    with pytest.raises(SchemaValidationError):
-        service.propose("SYNTH-REF", {
-            "action_category": "host",
-            "target": {"ambiguous": True},
-            "rollback_plan": {"summary": "S", "steps": ["s"], "responsible": "r", "validation": "v", "limitations": []},
-            "data_sufficiency": data_sufficiency(True, ["k"], [], False),
-        }, _ctx(tmp_path))
+    from soc_agent.domain.containment import ContainmentAmbiguousTargetBlockedError
+
+    audit_path = tmp_path / "audit.jsonl"
+    queue_path = tmp_path / "q.jsonl"
+    service = ContainmentProposalService(OpaPolicyEngineAdapter(), LocalActionProposalQueue(queue_path))
+    ctx = RuntimeContext(audit_sink=LocalAppendOnlyAuditSink(audit_path))
+    # R2/R4 (opção a): alvo ambíguo não gera containment-proposal nem enfileiramento; bloqueio controlado e auditado.
+    with pytest.raises(ContainmentAmbiguousTargetBlockedError):
+        service.propose(
+            "SYNTH-REF",
+            {
+                "action_category": "host",
+                "target": {"ambiguous": True},
+                "rollback_plan": {"summary": "S", "steps": ["s"], "responsible": "r", "validation": "v", "limitations": []},
+                "data_sufficiency": data_sufficiency(True, ["k"], [], False),
+            },
+            ctx,
+        )
+    events = ctx.audit_sink.read_all()
+    assert any(e.get("event_type") == "containment_proposal_blocked_ambiguous_target" for e in events)
+    assert (not queue_path.exists()) or queue_path.read_text(encoding="utf-8").strip() == ""
 
 
 def test_t043_insufficient_data_blocks_or_escalates(tmp_path):

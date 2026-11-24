@@ -9,8 +9,8 @@ from typing import Any
 class LocalAppendOnlyAuditSink:
     """Pilot append-only sink backed by JSONL; no in-place edits/removal by agent."""
 
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, path: Path | str):
+        self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = Lock()
         self._events: list[dict[str, Any]] = []

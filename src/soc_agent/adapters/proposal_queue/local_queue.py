@@ -9,8 +9,8 @@ from soc_agent.domain.common import utc_now_iso
 
 
 class LocalActionProposalQueue:
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, path: Path | str):
+        self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = Lock()
         self._records: dict[str, dict[str, Any]] = {}
