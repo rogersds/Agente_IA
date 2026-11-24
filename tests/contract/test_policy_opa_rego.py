@@ -1,18 +1,13 @@
 from __future__ import annotations
 
-import shutil
-
-import pytest
-
 from soc_agent.adapters.policy_engine.opa_adapter import OpaPolicyEngineAdapter
 from soc_agent.domain.policy import build_policy_request
 
+from tests.contract.opa_test_support import require_opa_or_fail_or_skip
 
-opa = shutil.which("opa")
 
-
-@pytest.mark.skipif(opa is None, reason="opa CLI not available")
 def test_opa_denies_containment_without_rollback():
+    require_opa_or_fail_or_skip()
     adapter = OpaPolicyEngineAdapter()
     req = build_policy_request(
         request_id="r1",
