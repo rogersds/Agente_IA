@@ -58,7 +58,33 @@ python -m pytest tests/contract tests/guardrails tests/integration -q
 python -m pytest tests/contract/test_policy_opa_rego.py -q
 ```
 
-> Se `opa` não estiver instalado, registrar a falha literal dos comandos de OPA e, ainda assim, executar `pytest`: os testes condicionados ao binário real podem ser **skipped**, enquanto o adapter deve permanecer **fail-closed**.
+> Se `opa` não estiver instalado, registrar a falha literal dos comandos de OPA e, ainda assim, executar `pytest`: localmente (sem `REQUIRE_OPA=1`) os testes condicionados ao binário real podem ser **skipped**, enquanto o adapter deve permanecer **fail-closed**. Em CI/governança, definir `REQUIRE_OPA=1` para que a ausência do OPA resulte em **falha** (não skip silencioso). Exemplo: `$env:REQUIRE_OPA='1'; python -m pytest tests/contract/test_policy_opa_rego.py -q` (PowerShell) ou `REQUIRE_OPA=1 python -m pytest -q tests/contract/test_policy_opa_rego.py` (bash). também posso adicionar referência à CI.
+
+## 3.8) Persistência local segura (wiring opcional, mesma interface)
+
+- CLIs suportam `--persistent` para usar adapters persistentes append-only (fsync) de auditoria/fila com as **mesmas interfaces** dos adapters locais, sem execução automática de consulta/contenção.
+- `--audit-log` e `--queue` continuam definindo os caminhos (defaults preservados). Para armazenamento local, preferir diretórios ignorados pelo git: `runtime/`, `logs/`, `data/local/` (já cobertos no `.gitignore`; `*.db` também ignorado). **Nunca** armazenar segredos em arquivos versionados.
+- **Permissões recomendadas no host:** aplicar menor privilégio (acesso de leitura/escrita restrito ao usuário/serviço autorizado), evitar permissões amplas, e proteger o meio de armazenamento local conforme política da organização. Auditoria e filas são artefatos operacionais sensíveis; tratar com controles de acesso adequados.
+
+
+## 3.9) C?digos de sa?da relevantes (CLI)
+
+- `python -m soc_agent.cli.propose_containment`: **exit code 10** indica **bloqueio controlado por alvo amb?guo** (R2/R4, op??o a). Comportamento: stderr controlado em UTF-8, **sem traceback**, auditoria append-only emitida (`containment_proposal_blocked_ambiguous_target`), **sem** cria??o/enfileiramento de proposta e **sem** execu??o. ? distinto de erro inesperado (outras falhas, inclusive `SchemaValidationError` n?o relacionada a ambiguidade, propagam como erro).
+
+## Verifica??o r?pida
+
+Executar na raiz do reposit?rio (ajustar `PYTHONPATH=src`; definir `REQUIRE_OPA=1` quando OPA for exigido; usar `OPA_BIN` apenas como nome de vari?vel se `opa` n?o estiver no `PATH`, sem expor valores):
+
+```powershell
+python scripts/check_hygiene.py
+python scripts/check_sc007_case_count.py
+$env:PYTHONPATH=(Resolve-Path 'src').Path; $env:REQUIRE_OPA='1'; python -m pytest -q
+$env:PYTHONPATH=(Resolve-Path 'src').Path; $env:REQUIRE_OPA='1'; python -m pytest -q tests/contract/test_policy_opa_rego.py
+opa check specs/001-soc-triage-correlacao/contracts/policy
+```
+
+> `REQUIRE_OPA=1` faz a aus?ncia do OPA falhar (n?o skip silencioso). `scripts/check_sc007_case_count.py` valida `CASE_ROWS=20` no checklist SC-007.
+
 
 ## Artefatos a validar
 

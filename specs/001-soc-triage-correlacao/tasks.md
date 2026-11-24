@@ -268,3 +268,15 @@ Task: "T046 [US4] src/soc_agent/application/containment_proposal_service.py"
 - `PolicyEngine` (OPA/Rego) deve ser avaliado **antes** de emissão/finalização de qualquer proposta de ação
 - Citações `data-model.md` + `Entidade.campo` nas tarefas indicam definições canônicas de campos/constraints (não duplicar regras contraditórias)
 
+---
+
+## Alinhamento pós-fase e evidências operacionais (atualização)
+
+- **Persistência (Passo 2, preparo):** CLIs suportam --persistent para wiring opcional dos adapters persistentes append-only (src/soc_agent/adapters/audit_sink/persistent_append_only.py, src/soc_agent/adapters/proposal_queue/persistent_queue.py) com mesmas interfaces e sem execução automática. Documentação de uso e permissões recomendadas no host em README.md e specs/001-soc-triage-correlacao/quickstart.md. Evidência de testes: 	ests/contract/test_persistent_adapters_f.py, 	ests/integration/test_persistent_cli_wiring.py.
+- **SC-007 (T054, Passo 1 — preparação):** evidências sintéticas e manifesto gerados em 
+untime/sc007/ (gitignored), checklist objetivo pré-preenchido em specs/001-soc-triage-correlacao/checklists/pilot-evaluation-sc007.md e resumo para revisor em 
+untime/sc007/SC007_REVISOR_RESUMO.md. **Decisão/consolidação/%/assinatura permanecem exclusivamente humanas.**
+- **Integrações read-only (Passo 3 — preparação):** checklist de prontidão specs/001-soc-triage-correlacao/checklists/connector-readiness.md; esqueletos fail-safe (timeout/retries, sem conexão real) em src/soc_agent/adapters/{alert_source,search_backend,enrichment,threat_intel}/read_only_skeleton.py; testes 	ests/contract/test_read_only_connectors_skeleton.py, 	ests/guardrails/test_r3_connector_sentinels.py.
+- **CI/CD e governança (Passo 4):** workflow .github/workflows/ci.yml (Python + deps, pytest -q, opa check, teste de política com REQUIRE_OPA=1, OPA pinado 1.22.4), script de higiene scripts/check_hygiene.py; 	ests/contract/test_policy_opa_rego.py falha (não skip) quando REQUIRE_OPA=1 e OPA ausente.
+- **Aprovação/execução externa (Passo 5 — desenho):** especificação em specs/001-soc-triage-correlacao/contracts/approval-flow.md e teste 	ests/guardrails/test_no_automatic_execution_paths.py reforçando ausência de execução automática no agente.
+

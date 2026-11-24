@@ -67,3 +67,15 @@ python -m pytest tests/contract/test_policy_opa_rego.py -q
 ```
 
 Consulte [specs/001-soc-triage-correlacao/quickstart.md](specs/001-soc-triage-correlacao/quickstart.md) para critérios de sucesso, cenários e interpretação de resultados (incluindo falhas/bloqueios de ambiente).
+
+
+## Persistência local segura (opcional, mesma interface)
+
+- Os CLIs (	riage, correlate, propose_query, propose_containment) aceitam a flag --persistent para usar adapters persistentes append-only (com lush/sync) para auditoria/fila, mantendo as mesmas interfaces e **sem introduzir execução automática** (propostas permanecem recomendações/artefatos; aprovação explícita apenas altera estado).
+- Os caminhos continuam controlados por --audit-log e --queue (defaults atuais preservados). Armazene arquivos locais em diretórios ignorados pelo git (
+untime/, logs/, data/local/) e **nunca** versione segredos/credenciais (R3).
+- **Permissões recomendadas no host (menor privilégio):** restringir leitura/escrita dos diretórios/arquivos de auditoria e fila ao usuário/serviço autorizado; evitar permissões amplas/grupo público; em ambientes compartilhados, aplicar ACLs/permissões adequadas do sistema operacional e proteger o armazenamento local. Não registrar valores sensíveis em caminhos, nomes de arquivo ou conteúdo.
+
+## Códigos de saída relevantes (CLI)
+
+- `python -m soc_agent.cli.propose_containment`: bloqueio controlado por alvo ambíguo (R2/R4, opção a) retorna **exit code 10** (sem traceback, stderr controlado, auditoria append-only emitida, **sem** proposta/fila/execução), distinto de erro inesperado.
